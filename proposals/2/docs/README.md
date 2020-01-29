@@ -29,12 +29,14 @@ Just like classic boot with the [jenkins-x-boot-config](https://github.com/jenki
 
 ## Benefits of helmfile and helm 3
 
-* We can use vanilla helm 3 now to install, update or delete charts in any namespace
+* We can use vanilla helm 3 now to install, update or delete charts in any namespace with tiller or custom code to manage `helm template`
+  * We can avoid all the complexities of the `jx step helm apply` logic using our own helm template generation + post processing logic. We can also move away from boot's use of `{{ .Requirements.foo }}` and `{{ .Parameters.bar }}` expressions
 * It opens the door to a flexible multi-cluster support so that every cluster/environment can be managed in the same canonical GitOps approach
 * We can use the `helm list` command line to view versions of each chart/app nicely in the CLI.
+  * we can avoid composite charts to simplfiy configuration and upgrades
 * Everything is now an app. So if you want to remove our `nginx-ingress` chart and replace it with another ingress solution (knative / istio / gloo / ambassador / linkerd or whatever) just go ahead and use the [apps commands](apps.md) to add/remove apps.
-* The boot git repository is much smaller and simpler; less to keep in sync/rebase/merge with the upstream git repository. Its mostly just 2 YAML files now `jx-requirements.yml` and `jx-apps.yml` which are both pretty much specific to your cluster installation
-* We can avoid all the complexities of the `jx step helm apply` logic using our own helm template generation + post processing logic. We can also move away from boot's use of `{{ .Requirements.foo }}` and `{{ .Parameters.bar }}` expressions
+* The boot git repository is much smaller and simpler; less to keep in sync/rebase/merge with the upstream git repository. Its mostly just 2 YAML files now `jx-requirements.yml` and `jx-apps.yml` which are both pretty much specific to your cluster installation.
+  * we rely more instead on the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) which can be shared across installations
 * secret handling is currently much simpler - you can provide a `secrets.yaml` file however you want via an environment variable. So ti shoudl be easy to mount secrets from any vault / github secret service / cloud provider service or local file.
 
 ## Apps Model
