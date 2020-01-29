@@ -13,7 +13,7 @@ Just like classic boot with the [jenkins-x-boot-config](https://github.com/jenki
 * the git repository contains a `jenkins-x.yml` to implement the boot pipeline
 * a YAML file is used to store all the charts that are applied using `jx boot`
 
-## Differences to `jx boot` and helm 3
+## Differences with `jx boot` and helm 3
 
 * we use helm 3 along with [helmfile](https://github.com/roboll/helmfile) to actually apply the helm charts into a kubernetes cluster
 * any helm chart can be deployed in any namespace (previously we used 1 namespace for all charts in the [env/requirements.yaml](https://github.com/jenkins-x/jenkins-x-boot-config/blob/master/env/requirements.yaml))
@@ -29,4 +29,4 @@ Just like classic boot with the [jenkins-x-boot-config](https://github.com/jenki
 
 ## Apps Model
 
-We have enhanced the existing [app extensibility model](apps.md) we have always had with Jenkins X to be more powerful (an app can be in any namespace and can make more use of the [version stream]())
+We have enhanced the existing [app extensibility model](apps.md) we have always had with Jenkins X to be more powerful (an app can be in any namespace and can make more use of the [version stream](https://jenkins-x.io/docs/concepts/version-stream/))
