@@ -95,12 +95,12 @@ releases:
 - alias: velero
   name: velero
   repository: https://kubernetes-charts.storage.googleapis.com
-  phase: pre-ingress  
+  phase: system  
   namespace: velero   
 - alias: nginx-ingress
   name: nginx-ingress
   repository: https://kubernetes-charts.storage.googleapis.com
-  phase: pre-ingress  
+  phase: system  
   namespace: kube-system   
 - name: external-dns
   repository: https://charts.bitnami.com/bitnami
@@ -217,3 +217,8 @@ We can easily try a prototype a new boot config repo where we add helmfile and a
 
 Maybe we find when we look at migrating the current charts to boot apps (nginx / cert manager / external-dns in particular) we may find its got some limitations and building a simple similar tool might be easier. Or we may find helmfile gets us where we need to go faster.
 
+
+
+### Current Implementation
+
+See the [Implementation Documentation](docs/README.md) for an overview of how to use helmfile and helm 3
