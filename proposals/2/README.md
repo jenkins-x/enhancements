@@ -3,6 +3,10 @@
 Issue: https://github.com/jenkins-x/jx/issues/6442
 Old design doc:: https://docs.google.com/document/d/1DL1oEeAZtWFfpJOWk5UVO54D88BnlqZDf5IDaOkGxCk/edit?usp=sharing
 
+### Current Implementation
+
+See the [Implementation Documentation](docs/README.md) for an overview of how to use helmfile and helm 3
+
 ## Requirements
 
 We want a simple canonical way to install any helm chart in any namespace without having to manually hack the `jx boot` pipeline file: `jenkins-x.yml`.
@@ -217,8 +221,3 @@ We can easily try a prototype a new boot config repo where we add helmfile and a
 
 Maybe we find when we look at migrating the current charts to boot apps (nginx / cert manager / external-dns in particular) we may find its got some limitations and building a simple similar tool might be easier. Or we may find helmfile gets us where we need to go faster.
 
-
-
-### Current Implementation
-
-See the [Implementation Documentation](docs/README.md) for an overview of how to use helmfile and helm 3
