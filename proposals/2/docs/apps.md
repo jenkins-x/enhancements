@@ -30,7 +30,7 @@ apps:
 
 This keeps the configuration in the environment git repository nice and concise. The `version` of the chart is then resolved during deployment via the [version stream](https://jenkins-x.io/docs/concepts/version-stream/).
 
-### Viewing apps
+### Viewing apps
 
 You can view your apps across all namespaces via [jx get app](https://jenkins-x.io/commands/jx_get_apps/)
 
