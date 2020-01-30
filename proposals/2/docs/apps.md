@@ -23,7 +23,7 @@ Then these commands will create Pull Requests on the [jx-apps.yml](https://githu
 Note that usually the Pull Request will only add a simple line of the format to the `applications:` entry:
 
 ```
-applications:
+apps:
 - name: jetstack/cert-manager 
 - name: flagger/flagger
 ``` 
@@ -39,4 +39,5 @@ jx get app
 ```
 
 This will effectively display data from the [jx-apps.yml](https://github.com/jenkins-x-labs/boot-helmfile-poc/blob/master/jx-apps.yml). This data will be pretty close to using a regular `helm list` using helm 3.x or later; only it will show apps across all namespaces by default..
+
 
