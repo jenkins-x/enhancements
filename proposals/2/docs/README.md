@@ -26,6 +26,10 @@ We have enhanced the existing [app extensibility model](apps.md) we have always 
 * an app can be in any namespace and can make more use of the [version stream](https://jenkins-x.io/docs/concepts/version-stream/))
 * everything is now an app including the system charts like `nginx-ingress` and `cert-manager`
 
+## Tips and tricks
+
+For those new to helmfile and helm there we have some [tips and tricks](tips.md)
+
 ## How it works
 
 Here is [how boot works with helmfile and helm 3](how-it-works.md) if you want to understand how the implementation works.
