@@ -3,7 +3,7 @@
 This document outlines the new `jx boot` implementation using [helmfile](https://github.com/roboll/helmfile) and helm 3. 
 
 
-## Benefits of helmfile and helm 3
+## Benefits of helmfile and helm 3
 
 * We can use vanilla helm 3 now to install, update or delete charts in any namespace without needing tiller or custom code to manage `helm template`
   * We can avoid all the complexities of the `jx step helm apply` logic using our own helm template generation + post processing logic. We can also move away from boot's use of `{{ .Requirements.foo }}` and `{{ .Parameters.bar }}` expressions
@@ -16,7 +16,7 @@ This document outlines the new `jx boot` implementation using [helmfile](https:/
 * secret handling is currently much simpler - you can provide a `secrets.yaml` file however you want via an environment variable. So it should be easy to mount secrets from any vault / github secret service / cloud provider service or local file.
   * we've moved population of the secrets outside of the boot process so we should be able to default to running `jx boot` via a helm chart to simplify installation and avoid issues with local laptop configuration + binary packaeg differences.
 
-## Comparison
+## Comparison
 
 Here is a [comparison of boot with helmfile and helm 3](comparison.md) in terms of similarities and differences if you are already aware of `jx boot` with helm 2.
 
@@ -26,7 +26,7 @@ We have enhanced the existing [app extensibility model](apps.md) we have always 
 * an app can be in any namespace and can make more use of the [version stream](https://jenkins-x.io/docs/concepts/version-stream/))
 * everything is now an app including the system charts like `nginx-ingress` and `cert-manager`
 
-## How it works
+## How it works
 
 Here is [how boot works with helmfile and helm 3](how-it-works.md) if you want to understand how the implementation works.
 
