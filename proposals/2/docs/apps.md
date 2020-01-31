@@ -40,6 +40,31 @@ apps:
 
 This keeps the configuration in the environment git repository nice and concise. The `version` of the chart is then resolved during deployment via the [version stream](https://jenkins-x.io/docs/concepts/version-stream/).
 
+### Adding new kubernetes resources
+
+Sometimes you just want to add one or more kubernetes resources such as an `Ingress` or `ConfigMap`.
+
+Helmfile supports using helm charts in source code format; so its easy to add any kubernetes resources directly via YAML files.
+
+e.g. if you look in the `repositories/templates` folder you will see at least one YAML resource. So you could just add more YAML files to that folder.
+
+Though you may want to separate out your resources into their own chart; so you could add a new folder structure like the `resources` folder. e.g. add these files:
+
+``` 
+mythings/
+  Chart.yaml
+  templates/
+     some-resource.yaml
+```
+
+Then to reference `mythings` add the following to your `jx-apps.yml` file:
+
+```
+- name: mythings
+  repository: ".."
+```
+
+Then longer term if you want to turn your chart `mythings` into a released chart you could create a new git repository and move the folder there, then just remove the `repository:` entry in the `jx-apps.yml` to reference the released chart instead.
 
 ### Customising charts
 
@@ -51,7 +76,7 @@ To see an example of this in action check out the [apps/jenkins-x/tekton/values.
 
 Note that many apps are already configured to make use of the `jx-requirements.yml` settings via the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) - but you are free to add your own custom configuration. 
 
-### Removing apps
+### Removing apps
 
 To remove an app use [jx delete app](https://jenkins-x.io/commands/jx_delete_app/):
 
