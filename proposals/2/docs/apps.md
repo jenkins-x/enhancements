@@ -30,7 +30,7 @@ these commands will implicitly use the [version stream](https://jenkins-x.io/doc
 
 Then these commands will create Pull Requests on the [jx-apps.yml](https://github.com/jenkins-x-labs/boot-helmfile-poc/blob/master/jx-apps.yml) file in your environments git repository.
 
-Note that usually the Pull Request will only add a simple line of the format to the `applications:` entry:
+Note that usually the Pull Request will only add a simple line of the format to the `apps:` entry:
 
 ```
 apps:

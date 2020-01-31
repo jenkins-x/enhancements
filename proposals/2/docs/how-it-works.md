@@ -46,7 +46,7 @@ In an effort to try streamline the users boot configuration repository, we've tr
 For example the default `namespace` for a chart and the `phase` (whether its installed via the `system` helmfile or the default `apps` helmfile) can be specified in the `defaults.yml` file in the version stream. e.g. here's where we define the [apps/stable/nginx-ingress/defaults.yml](https://github.com/jenkins-x/jenkins-x-versions/blob/master/apps/stable/nginx-ingress/defaults.yml) for `nginx-ingress`. This keeps the actual `jx-apps.yml` nice and simple...
 
 ```yaml
-applications:
+apps:
 - name: stable/nginx-ingress
 ...
 ```
@@ -54,7 +54,7 @@ applications:
 Though if you really want you can be completely specific in your `jx-apps.yml` file:
 
 ```yaml
-applications:
+apps:
 - name: stable/nginx-ingress
   repository: https://kubernetes-charts.storage.googleapis.com
   namespace: nginx
