@@ -39,10 +39,11 @@ secrets:
     token: "" 
 ```
 
-Then define `JX_SECRETS_DIR`:
+Then define `JX_SECRETS_YAML` to point to this YAML file (wherever you put it):
 
 ```
-export JX_SECRETS_DIR=$HOME/.jx/localSecrets/{{ add your cluster name }}/                               
+export JX_SECRETS_YAML=$HOME/.jx/localSecrets/{{ add your cluster name }}/secrets.yaml                               
+
 ```
     
 ### Using boot
