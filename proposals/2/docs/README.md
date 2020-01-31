@@ -2,6 +2,9 @@
 
 This document outlines the new `jx boot` implementation using [helmfile](https://github.com/roboll/helmfile) and helm 3. 
 
+## Getting started
+
+See the [getting started guide](getting-started.md)
 
 ## Benefits of helmfile and helm 3
 
