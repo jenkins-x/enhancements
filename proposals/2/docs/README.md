@@ -6,6 +6,10 @@ This document outlines the new `jx boot` implementation using [helmfile](https:/
 
 See the [getting started guide](getting-started.md)
 
+## Multi cluster
+
+See the [multi cluster guide](multi-cluster.md) for how to use separate Kubernetes clusters for Staging and/or Production.
+
 ## Benefits of helmfile and helm 3
 
 * We can use vanilla helm 3 now to install, update or delete charts in any namespace without needing tiller or custom code to manage `helm template`
