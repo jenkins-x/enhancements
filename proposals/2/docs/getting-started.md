@@ -4,7 +4,7 @@ Currently you will need a custom build of `jx` from this [Pull Request](https://
 
 Also you will need to install [helmfile](https://github.com/roboll/helmfile) 
 
-### Installing helmfile
+### Installing helmfile
 
 On a mac you can install `helmfile` via:
 
