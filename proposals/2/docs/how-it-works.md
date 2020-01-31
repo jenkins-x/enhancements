@@ -39,7 +39,7 @@ So the pipeline is very similar to the traditional helm 2 boot pipeline. The mai
 This is all done by the [jx step create helmfile](https://jenkins-x.io/commands/jx_step_create_helmfile/) command if you want to look at the code. Essentially we take that YAML file and parse it and use it to generate one of the helmfiles: `system/helmfile.yaml` for system charts (installed before ingress, DNS, TLS and certs are setup and the domain is known) and any other charts in `apps/helmfile.yaml`.
 
 
-#### Defaulting configuration
+#### Defaulting configuration
 
 In an effort to try streamline the users boot configuration repository, we've tried to put as much common configuration into the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) as possible. 
 
