@@ -6,7 +6,7 @@ This proposal tries to conslidate Apps and Addons inside Jenkins X to avoid conf
 
 Two years ago we added the addon framework to Jenkins X as a way of extending the Jenkins X platform to provide additional capabilities. 
 
-### We created Addons
+### We created Addons
  
 `Addons` were either generic helm charts or a combination of helm chart plus some custom go code to install and integrate them with the Jenkins X platform.
 
