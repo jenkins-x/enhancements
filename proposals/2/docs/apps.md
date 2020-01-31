@@ -6,9 +6,19 @@ In essence that means if you are using helmfile you can use the usual Apps comma
 
 This also means you can have apps in different namespaces. e.g. its common to put some charts in different namespaces like `nginx-ingress`, `gloo`, `cert-mangager` etc.
 
-### Using the apps commands
+### Viewing apps
 
-you can use [jx add app](https://jenkins-x.io/commands/jx_add_app/) to add apps using the usual helm style notation of `repositoryPrefix/chartName` such as:
+You can view your apps across all namespaces via [jx get app](https://jenkins-x.io/commands/jx_get_apps/)
+
+``` 
+jx get app
+```
+
+This will effectively display data from the [jx-apps.yml](https://github.com/jenkins-x-labs/boot-helmfile-poc/blob/master/jx-apps.yml). This data will be pretty close to using a regular `helm list` using helm 3.x or later; only it will show apps across all namespaces by default..
+
+### Adding apps or charts
+
+you can use [jx add app](https://jenkins-x.io/commands/jx_add_app/) to add any helm chart to your installation using the usual helm style notation of `repositoryPrefix/chartName` such as:
 
 ```
 jx add app jetstack/cert-manager
@@ -16,7 +26,7 @@ jx add app flagger/flagger
 
 ```
 
-these commands will implicity use the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) configuration (via [charts/repositories.yml](https://github.com/jenkins-x/jenkins-x-versions/blob/master/charts/repositories.yml)) to determine the mapping of prefixes to repository URLs.
+these commands will implicitly use the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) configuration (via [charts/repositories.yml](https://github.com/jenkins-x/jenkins-x-versions/blob/master/charts/repositories.yml)) to determine the mapping of prefixes to repository URLs.
 
 Then these commands will create Pull Requests on the [jx-apps.yml](https://github.com/jenkins-x-labs/boot-helmfile-poc/blob/master/jx-apps.yml) file in your environments git repository.
 
@@ -30,14 +40,21 @@ apps:
 
 This keeps the configuration in the environment git repository nice and concise. The `version` of the chart is then resolved during deployment via the [version stream](https://jenkins-x.io/docs/concepts/version-stream/).
 
-### Viewing apps
 
-You can view your apps across all namespaces via [jx get app](https://jenkins-x.io/commands/jx_get_apps/)
+### Customising charts
 
-``` 
-jx get app
+You can add custom `values.yaml` files for a chart by adding the file to `apps/mychart/values.yaml`. This file will then be referenced in the generated `apps/helmfile.yaml` file and passed into `helm` when you next run `jx boot`.
+
+You can also use a file called `values.yaml.gotmpl` if you wish to use go templating of the values file. For example this lets you reference properties from the `jx-requirements.yml` file via expressions like `{{ .Values.jxRequirements.ingress.domain }}`. You can also reference the shared secrets in your `values.yaml.gotmpl` file via `{{ .Values.secrets.pipelineUser.username }}`.
+
+To see an example of this in action check out the [apps/jenkins-x/tekton/values.yaml.gotmpl](https://github.com/jenkins-x/jenkins-x-versions/tree/master/apps/jenkins-x/tekton/values.yaml.gotmpl) file in the [version stream](https://jenkins-x.io/docs/concepts/version-stream/).
+
+Note that many apps are already configured to make use of the `jx-requirements.yml` settings via the [version stream](https://jenkins-x.io/docs/concepts/version-stream/) - but you are free to add your own custom configuration. 
+
+### Removing apps
+
+To remove an app use [jx delete app](https://jenkins-x.io/commands/jx_delete_app/):
+
 ```
-
-This will effectively display data from the [jx-apps.yml](https://github.com/jenkins-x-labs/boot-helmfile-poc/blob/master/jx-apps.yml). This data will be pretty close to using a regular `helm list` using helm 3.x or later; only it will show apps across all namespaces by default..
-
-
+jx delete app jetstack/cert-manager
+```
