@@ -22,6 +22,29 @@ helm plugin install https://github.com/aslafy-z/helm-git.git
 helm plugin install https://github.com/databus23/helm-diff
 ```
 
+### Setting up your secrets
+
+write some installation secrets to a file using the template below, this is a temporary solution
+
+```
+vi $HOME/.jx/localSecrets/{{ add your cluster name }}/secrets.yaml
+secrets:     
+  adminUser:
+    username: "admin"
+    password: "" 
+  hmacToken: "" 
+  pipelineUser:
+    username: ""  
+    email: "" 
+    token: "" 
+```
+
+Then define `JX_SECRETS_DIR`:
+
+```
+export JX_SECRETS_DIR=$HOME/.jx/localSecrets/{{ add your cluster name }}/                               
+```
+    
 ### Using boot
 
 Now run:
@@ -30,4 +53,13 @@ Now run:
 jx boot --helmfile
 ```
 
-and follow the prompts
+and follow the prompts.
+
+
+### Uninstall
+
+To uninstall your Jenkins X installation from the git clone of the boot configuration run:
+
+```
+helmfile destroy    
+```        
