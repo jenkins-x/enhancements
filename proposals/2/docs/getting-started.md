@@ -26,8 +26,9 @@ helm plugin install https://github.com/databus23/helm-diff
 
 write some installation secrets to a file using the template below, this is a temporary solution
 
-```
-vi $HOME/.jx/localSecrets/{{ add your cluster name }}/secrets.yaml
+```      
+mkdir -p /tmp/.jx/localSecrets/currentCluster
+vi /tmp/.jx/localSecrets/currentCluster/secrets.yaml
 secrets:     
   adminUser:
     username: "admin"
@@ -41,9 +42,8 @@ secrets:
 
 Then define `JX_SECRETS_YAML` to point to this YAML file (wherever you put it):
 
-```
-export JX_SECRETS_YAML=$HOME/.jx/localSecrets/{{ add your cluster name }}/secrets.yaml                               
-
+```     
+export JX_SECRETS_YAML=/tmp/.jx/localSecrets/currentCluster/secrets.yaml
 ```
     
 ### Using boot
