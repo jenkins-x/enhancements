@@ -11,4 +11,5 @@ All proposals are welcome, please follow this process:
 ## Proposals
 
 * [1: Apps and Addons](proposals/1/README.md) - simplifying the language and concepts in Jenkins X
-* [1: Boot Apps](proposals/2/README.md) - provide a generic mechanism to install/upgrade any chart in boot
+* [2: Boot Apps](proposals/2/README.md) - provide a generic mechanism to install/upgrade any chart in boot
+* [3: Labs](proposals/labs/README.md) - enable rapid innovation while keeping a stable base platform
