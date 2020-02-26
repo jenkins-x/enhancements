@@ -23,7 +23,7 @@ We want to continue to innovate with Jenkins X, increase community contributions
 
 This proposal introduces the idea of creating an incubation area of sorts called Jenkins X Labs, here we can experiment, inovate and attract wider community contribution, working in a sandboxed area so that newer changes do not go into the main codebase until there's confidence in them.
 
-Looking at how other heavily based CLI projects work it seems that some like `gcloud` have the concept of `alpha` and `beta` CLI components that introduce changes to users who opt into them.  This is a great way to gather feedback and reduce the risk of changes that need to change significantly or be deprecated.
+Looking at how other heavily based CLI projects work it seems that some like `gcloud` have the concept of `alpha` and `beta` CLI components that introduce changes to users who opt into them.  This is a great way to gather feedback and reduce the risk of changes that need to differ significantly or be deprecated.
 
 ## 1.1 Motivation
 
@@ -47,15 +47,20 @@ This proposal is about creating an environment, culture and process that aids in
 
 The Labs GitHub Org maintains the list of alpha commands, once defined acceptace for that feature is acheived the feature will move to beta which is owned by the Jenkins X GitHub Org.  There is an expectation that feature, UX and APIs around it will largely stay the same as it matures from beta to GA because the feature will have been proven with community feedback and other acceptance criteria.  Any chnages to this during `beta` should be communicated and agreed on by the Labs organisation to ensure users that take part in the alpha commands continue to provide feedback.
 
+When a feature that may and probably will span multiple repos, beit CLI, images, quickstarts, charts etc we will make sure that there is good involvement and understanding of features so they can be picked up and moved to `beta` inside the Jenkins X org.  This will be a learning process where we will look to always improve.
+
 ## 2.1 Technical
 
-The technical design here is pretty loose because the proposal is about process however, one point of implementation that we are suggesting is that `jx` has the ability to include the `alpha` and `beta` commands.
+* we are suggesting is that `jx` has the ability to include the `alpha` and `beta` commands
+* images built within the labs organisation will be pushed to gcr.io/jenkinsx-labs so that users will be able to identify them on inspection.
+
+
 
 ## 2.3. Out of Scope
 
 * what commands are alpha or what features we start with, the process is about how not what.
 
-# 3. Acceptance Criteria
+# 3. Acceptance Criteria for this Proposal
 
 * approval from the Jenkins X steering committee
 
