@@ -37,6 +37,8 @@ Introduce a new GitHub Organisation called [Jenkins X Labs](https://github.com/j
 
 Most changes for Jenkins X go through the [jx](https://github.com/jenkins-x/jx) CLI repository which has grown into a monolith and has a number of downstream dependencies.  We have been working with a Proof of Concept in Labs that takes a microservices approach to creating commands that inturn can be used to create `alpha` or `beta` binaries that can be optionally installed via `jx`.
 
+So to be clear the proposal for labs is generic and not only focused on the `jx` CLI.  We will want to take similar steps to building docker images, quickstarts, buildpacks etc that use labs features so they don't appear in Jenkins X until feature complete.
+
 An interesting obeservation has been made that using this microservices approach combined with the `alpha` and `beta` commands, it could make for a good way to refactor out the current `jx` monolith, statically importing dependencies from `jx` when we need them but over time refactoring into a more modular approach that will help with maintainability, supportability and testability.
 
 Taking a microservices approach for the CLI will surely bring new challanges but given that we push microservice with the Jenkins X project it is another area of dogfooding that we can learn from and pass on a great experience to users.
