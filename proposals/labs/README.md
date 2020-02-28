@@ -64,5 +64,5 @@ When a feature that may and probably will span multiple repos, beit CLI, images,
 
 # 3. Acceptance Criteria for this Proposal
 
-* approval from the Jenkins X steering committee
+* approval from the [Jenkins X steering committee](https://github.com/jenkins-x/steering)
 
