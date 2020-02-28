@@ -5,7 +5,7 @@ Old design doc:: https://docs.google.com/document/d/1DL1oEeAZtWFfpJOWk5UVO54D88B
 
 ### Current Implementation
 
-See the [Implementation Documentation](docs/README.md) for an overview of how to use helmfile and helm 3
+See the [Implementation Documentation](/docs/labs/boot/) for an overview of how to use helmfile and helm 3
 
 ## Requirements
 
