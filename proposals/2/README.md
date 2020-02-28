@@ -1,3 +1,10 @@
+---
+title: Boot Apps with Helm 3 and Helmfile
+linktitle: Boot Apps with Helm 3 and Helmfile
+description: Boot Apps with Helm 3 and Helmfile
+weight: 20
+---
+
 # 2: Boot Apps
 
 Issue: https://github.com/jenkins-x/jx/issues/6442

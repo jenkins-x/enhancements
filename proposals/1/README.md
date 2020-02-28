@@ -1,3 +1,10 @@
+---
+title: Consolidate Apps and Addons
+linktitle: Consolidate Apps and Addons
+description: Consolidate Apps and Addons
+weight: 10
+---
+
 # 1: Consolidate Apps and Addons
 
 This proposal tries to conslidate Apps and Addons inside Jenkins X to avoid confusion
