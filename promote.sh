@@ -24,11 +24,8 @@ MESSAGE="chore: updated enhancements content"
 pushd jx-docs/content/en/docs/labs/enhancements
   git checkout master
   git pull
-popd
-
-pushd jx-docs
-  git add *
-  git commit --allow-empty -a -m "$MESSAGE"
-
+  cd ..
+  git add enhancements
+  git commit --allow-empty -m "$MESSAGE"
   git push origin master
 popd
