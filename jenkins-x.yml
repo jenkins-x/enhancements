@@ -1,6 +1,16 @@
 buildPack: none
 pipelineConfig:
   pipelines:
+    pullRequest:
+      pipeline:
+        agent:
+          image: gcr.io/jenkinsxio/builder-go
+        stages:
+        - name: release
+          steps:
+          - command: echo dummy step
+            dir: /workspace/source
+            name: dummy
     release:
       pipeline:
         agent:
