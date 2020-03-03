@@ -21,6 +21,12 @@ git clone https://github.com/jenkins-x/jx-docs.git
 
 MESSAGE="chore: updated enhancements content"
 
+pushd jx-docs
+  git submodule update --init --recursive
+  git submodule status --recursive
+  git pull --recurse-submodules
+popd
+
 pushd jx-docs/content/en/docs/labs/enhancements
   git checkout master
   git pull
