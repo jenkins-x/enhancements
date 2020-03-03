@@ -15,17 +15,13 @@ Over time we can then bring more value to folks using a mixture of Jenkins + Jen
     *   E.g. reuse Jenkins X Apps / Pipelines for linting, code quality, security scanning - while preserving the existing Jenkins pipelines
 
 
-## Solution: trigger-pipeline
+## Solutio
 
-There is a stand alone PoC here - it’s pretty small and simple and very little code:
+Check out the [docs for using the PoC and using it with Jenkins X and helm 3](https://jenkins-x.io/docs/labs/jenkins/)
 
-[https://github.com/jenkins-x-labs/trigger-pipeline](https://github.com/jenkins-x-labs/trigger-pipeline)
-
-_Trigger-pipeline_ is a small CLI / container image which can be invoked from inside any kind of CI / pipeline to trigger a pipeline in a remote Jenkins server.
+In addition there is a small CLI / container image [jenkins-x-labs/trigger-pipeline](https://github.com/jenkins-x-labs/trigger-pipeline) which can be invoked from inside any kind of CI / pipeline to trigger a pipeline in a remote Jenkins server.
 
 This allows a jenkins pipeline to be invoked in:
-
-
 
 *   any kubernetes cluster/namespace
 *   any jenkins server (inside or outside of k8s)
