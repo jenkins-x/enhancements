@@ -2,17 +2,17 @@
 title: Boot Apps with Helm 3 and Helmfile
 linktitle: Boot Apps with Helm 3 and Helmfile
 description: Boot Apps with Helm 3 and Helmfile
+type: docs
 weight: 20
 ---
 
-# 2: Boot Apps
-
 Issue: https://github.com/jenkins-x/jx/issues/6442
+
 Old design doc:: https://docs.google.com/document/d/1DL1oEeAZtWFfpJOWk5UVO54D88BnlqZDf5IDaOkGxCk/edit?usp=sharing
 
 ### Current Implementation
 
-See the [Implementation Documentation](/docs/labs/boot/) for an overview of how to use helmfile and helm 3
+Refer to th [jxl](https://github.com/jenkins-x-labs/jxl) repository for an overview of how to use helmfile and helm 3.
 
 ## Requirements
 
@@ -26,7 +26,7 @@ We want a simpler more modular system that lets us, say, swap out nginx-controll
 
 What we’d really like is for folks to type commands like…
 
-```
+```sh
 jx delete app nginx-controller
 jx add app istio
 jx delete app knative
@@ -69,7 +69,6 @@ Right now we deploy all charts in Staging/Production as a single chart. That mea
 
 If you remove a chart from `env/requirements.yaml`  in the Dev repository the pipeline does not remove the chart. e.g. if you add `lighthouse` and remove `prow` you need to manually delete the prow resources yourself.
 
-
 ### Limitation of boot
 
 We currently manually configure in the boot pipeline the install of multiple systems usually in separate namespaces:
@@ -92,27 +91,26 @@ We'd also like to make it easy to add a number of other systems in order in sepa
 
 so it'd be nice to have a simple app model where anyone can add any systems/charts to any namespace at any point in the flow before we setup the dev/staging/production environment in the traditional way.
 
-
 ## Proposal
 
 We propose we combine the extensibility of Jenkins X using Apps with `jx boot` via a simple declarative YAML file declaring the charts to be installed. 
 
 e.g. a file `apps.yaml`  something like this:
 
-```yaml    
+```yaml
 defaultNamespace: jx
 
-releases: 
+releases:
 - alias: velero
   name: velero
   repository: https://kubernetes-charts.storage.googleapis.com
   phase: system  
-  namespace: velero   
+  namespace: velero
 - alias: nginx-ingress
   name: nginx-ingress
   repository: https://kubernetes-charts.storage.googleapis.com
   phase: system  
-  namespace: kube-system   
+  namespace: kube-system
 - name: external-dns
   repository: https://charts.bitnami.com/bitnami
   phase: post-ingress  
@@ -144,12 +142,10 @@ releases:
 
 Using a yaml file in a boot config repo we list the apps that should be installed.  This means we can instead have a bare minimum base boot config repo and list the apps we want installed and different points of the installation process.
 
-
 The above YAML looks quite like the `env/requirements.yaml` file only: 
 
 * it allows the `namespace` to be specified if its different from the `defaultNamespace`
 * we add the `phase` label so that we can filter the apps by phase so we can install different charts at different points in the boot pipeline.
-
 
 ### Strawman Solutions
 
@@ -165,14 +161,12 @@ It looks like helmfile already supports tillerless + helm3 and lets us define na
 
 We may need to build our own step to wrap helmfile so that we can do some of the things we do with `jx step helm apply` right now (e.g. exposing the `jx-requirements.yml` file as a `values.yaml` its values can be used inside any `values.yaml` we use in the charts).
 
-
 * should we support access to secrets in vault / local file system via URLs or Parameters injection?
 * do we need to support exposing the properties from the `jx-requirements.yml` as values.yaml files that can be reused inside the helmfile templates?
 * do we need to improve access to certs / domain after we've set those up in boot?
 * allow the use of version streams to manage versions of things if no version is specified in the `helmfile.yaml` - like we do with helm charts requirements.yaml file right now (in `jx step helm apply`)
 
 So if we do need anything other than vanilla helmfile we could maybe do a similar thing to `jx step helm apply` where we copy the directory where helmfile lives, then generate any secret yamls + `jx-requirements.yaml` files and then run helmfile in a temporary directory (to avoid accidentally committing any secrets to git). Hopefully we don't need to fork helmfile; but we could just wrap it slightly with a pre-processor?
-
 
 We want to allow the `jx boot` pipeline to invoke a helmfile like thing at the different phases.
 
@@ -188,7 +182,7 @@ so we already have 3 natural places to invoke a helmfile-like thing to install c
 
 e.g. the pipeline with boot apps could be something like this...
 
-```
+```sh
 jx step helmfile --selector phase=pre-ingress
 
 # populate ingress stuff (e.g. default domain from nip.io if not using custom domain)
@@ -207,17 +201,13 @@ jx step helmfile --selector "!phase" --secrets
 
 Then we could have a list of apps which we group as to where they get added based on what they are & whether they need integration with secrets / TLS / domain / certs etc?
 
-
 We can then modify the existing `jx add app / jx delete app` to detect the `apps.yaml` file and create the necessary code change in a Pull Request.
 
 Maybe over time we move more towards this kind of helmfile-like approach for all environments too (`Dev` / `Staging` and `Production`)?
 
-
 ### Proposed Schedule
 
 We can easily try a prototype a new boot config repo where we add helmfile and add some helmfile steps and see how it works and what we think of the general git source code & if it helps us and users have modular boot apps without committing to any significant changes in the jx repos.
-
-
 
 * try out helmfile for installing things like gloo / knative / linkerd / istio?
 * if that works and we are happy with it, we could look at adding the phases approach for easier app composition
@@ -227,4 +217,3 @@ We can easily try a prototype a new boot config repo where we add helmfile and a
 * create a demo repository which replaces nginx-controller with knative + gloo we can use for Progressive Delivery demos
 
 Maybe we find when we look at migrating the current charts to boot apps (nginx / cert manager / external-dns in particular) we may find its got some limitations and building a simple similar tool might be easier. Or we may find helmfile gets us where we need to go faster.
-

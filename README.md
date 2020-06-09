@@ -2,8 +2,10 @@
 title: Enhancement Process
 linktitle: Enhancement Process
 description: Labs enhancements process
+type: docs
 weight: 10
 ---
+
 # Enhancements
 
 This repository contains design proposals for [Jenkins X](https://jenkins-x.io/) enhancements.
