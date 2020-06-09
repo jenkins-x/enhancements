@@ -8,7 +8,7 @@ weight: 10
 
 # Enhancements
 
-This repository contains design proposals for [Jenkins X](https://jenkins-x.io/) enhancements.
+The [enhancements repository](https://github.com/jenkins-x/enhancements) contains design proposals for [Jenkins X](https://jenkins-x.io/) enhancements.
 
 All proposals are welcome, please follow this process:
 
