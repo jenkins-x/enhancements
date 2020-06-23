@@ -97,3 +97,7 @@ to use `dependabot` (on a weekly schedule) to update dependencies in sub project
 the community to use.  If we find that we are constantly version chasing from one module to the next, then that code is too 
 highly coupled and we need to rethink (refactor or take a different approach)
 
+## 5. Additional Benefits
+
+It may make sense to use this as an opportunity to dog-food Jenkins-X. We should create a buildpack to allow the easy
+creation of new modules that contains all of the build & lint configuration required.
