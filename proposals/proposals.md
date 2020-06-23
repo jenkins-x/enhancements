@@ -11,3 +11,5 @@ weight: 100
 * [Cloud Resource Creation](https://github.com/hferentschik/enhancements/blob/cloud-resources/proposals/3/README.md)
 
 * [Trigger Jenkins Pipelines](https://github.com/jstrachan/enhancements/blob/jenkins-trigger/proposals/trigger-jenkins/README.md)
+
+* [Decomposition of Jenkins X](https://github.com/garethjevans/enhancements/blob/decomposition/proposals/5/README.md)
