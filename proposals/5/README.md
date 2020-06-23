@@ -66,9 +66,10 @@ All new repositories should aim for the following:
 
 * Basic documentation to explain how the module should be used
 * A full set of [linters](https://golangci-lint.run/usage/linters), suggesting (asciicheck bodyclose deadcode dogsled dupl errcheck goconst gofmt goimports gosec gosimple govet ineffassign interfacer misspell staticcheck structcheck typecheck unconvert unparam unused varcheck), ideally add gocyclo, nestif & gocritic
-* Tests
+* Tests (we should define a base level for code coverage, I'd expect this to be quite low initially)
 * [Go Report Card](https://goreportcard.com/)
 * Should aim to use [Semantic Versioning](https://semver.org/)
+* Change Logs
 
 Q: It may be possible to template this out? or even use a buildpack to create this?
 
@@ -84,5 +85,15 @@ It should be easier to do the right thing, than the wrong thing.
 **When should we start this?** We should aim to start this immediately, new functionality should be written in this decomposed way, if 
 we ultimately decide that this is a bad idea, Its far easier to refactor something into the JX codebase than it is to refactor something out.
 
+**I have an idea for a module?** Great, add it to the list.
 
+**Shouldn't we plan out what modules we are going to need first?** It's very hard to understand exactly what we can 
+extract in a timely manner, without trying to do it.  I'm expecting there to be a number of failed attempts / false starts
+on this - and this is ok.  For instance, we may discover that we need to perform a refactor inside JX before we can pull out 
+a module, this is ok. It's all part of continuously improving.
+
+**Won't extra modules add additional overhead?** Yes they will, but they will also bring much larger advantages.  We should aim
+to use `dependabot` (on a weekly schedule) to update dependencies in sub projects, afterall, this is what we would expect
+the community to use.  If we find that we are constantly version chasing from one module to the next, then that code is too 
+highly coupled and we need to rethink (refactor or take a different approach)
 
