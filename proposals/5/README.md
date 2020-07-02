@@ -33,14 +33,16 @@ There are currently a number of proposed repositories/modules, some of these are
 
 * [jx-api](https://github.com/jenkins-x/jx-api): JX CRDs / Installation Requirements
 * [jx-kube-client](https://github.com/jenkins-x/jx-kube-client): A helper module to create a Kubernetes rest config
-* [jx-vault-client](https://github.com/jenkins-x/jx-vault-client): longer term, it may make sense to deprecate this.
-* [go-scm](https://github.com/jenkins-x/go-scm): All 
+* [jx-vault-client](https://github.com/jenkins-x/jx-vault-client): **Deprecated** this has been implemented to aid decomposition, it will not be supported longer term.
+* [go-scm](https://github.com/jenkins-x/go-scm): All SCM operations
+* [lighthouse-config](https://github.com/jenkins-x/lighthouse-config)
 
 ### Proposed Modules
 
-* jx-kube: It may make sense to refactor some of the higher level utils/kube functions within JX into its own package to make them reusable.
-* Version Streams: Would these make sense to be moved out of JX
-* Gitter?
+* jx-kube/jx-helpers: It may make sense to refactor some of the higher level utils/kube functions within JX into its own package to make them reusable.
+* Metapipeline Client
+* [codegen](https://github.com/jenkins-x/jx-codegen): this currently exists within the JX repository and is often copied between projects.
+* Version Streams: Would these make sense to be moved out of JX?
 * Updatebot (jx create pr)? This would have value outside of the core JX codebase 
 * Storage APIs?
 * Cloud APIs?
