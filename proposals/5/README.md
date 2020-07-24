@@ -1,4 +1,4 @@
-****---
+---
 title: Decomposition of Jenkins X
 linktitle: Decomposition of Jenkins X
 description: Decomposition of Jenkins X

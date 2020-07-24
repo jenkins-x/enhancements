@@ -1,3 +1,10 @@
+---
+title: Preview with Helmfile
+linktitle: Preview with Helmfile
+description: Preview with Helmfile
+type: docs
+weight: 40
+---
 
 # JX Enhancement 4: Preview with Helmfile
 
@@ -7,7 +14,8 @@ This document outlines the work for deploying [Jenkins X Preview Environments](h
 
 ### 1.1 Motivation
 
-Preview Environments are currently (April 2020) implemented using an "umbrella (Helm) chart", named `preview`, located in the `charts/preview` directory of applications repositories. This umbrella chart usually has no templates, just a dependency on the "main" application chart, and maybe on some other charts. Values for the main application can be customized by using the `values.yaml` file of the preview chart.
+Preview Environments are currently (April 2020) implemented using an "umbrella (Helm) chart", named `preview`, located in the `charts/preview` directory of applications repositories.
+This umbrella chart usually has no templates, just a dependency on the "main" application chart, and maybe on some other charts. Values for the main application can be customized by using the `values.yaml` file of the preview chart.
 
 This implementation works, but has a number of limitations:
 - no templating of the preview's `values.yaml` - the workaround is to use Helm's `tpl` function in the main chart's templates when using values customized by the preview chart.
@@ -26,7 +34,8 @@ Helm is currently used by Jenkins X to:
 - package the application's chart - in the release pipeline
 - install the applications in the staging/prod environments
 
-There is already work being done to re-implement the staging/prod charts installation, using [Helmfile](https://github.com/roboll/helmfile), which would also bring in Helm 3 support. This work might also be used for the "jx boot" part.
+There is already work being done to re-implement the staging/prod charts installation, using [Helmfile](https://github.com/roboll/helmfile), which would also bring in Helm 3 support. 
+This work might also be used for the "jx boot" part.
 
 So it means there are 2 "direct" use of Helm left: the previews and the chart packaging. This proposal is focused on the previews use-case, and coherent with what is being done in other parts of Jenkins X.
 
@@ -49,9 +58,69 @@ Why [Helmfile](https://github.com/roboll/helmfile)?
 
 ### 2.2 Design
 
-The `charts/preview` directory won't be a Helm chart anymore, but an Helmfile project. And instead of using raw Helm commands to deploy the preview, jx will use Helmfile commands.
+The `charts/preview` directory won't be a Helm chart anymore, but an Helmfile project. 
+And instead of using raw Helm commands to deploy the preview, jx will use Helmfile commands.
 
-The only required file in this folder is [helmfile.yaml](helmfile.yaml) - which defines all the releases we want to install. Custom values can either be written directly in this file, or in other files - such as [values.yaml.gotmpl](values.yaml.gotmpl) - which are defined in the main `helmfile.yaml`. 
+The only required file in this folder is `the helmfile.yaml` - which defines all the releases we want to install.
+```yaml
+# https://github.com/roboll/helmfile
+
+# we can use Helm 3 if its present in the container image
+helmBinary: helm3
+
+helmDefaults:
+  wait: true
+  timeout: 180 # seconds
+
+# extra Helm repositories
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: something-else
+    url: http://charts.example.com
+
+# all the releases we want to install in a preview env
+releases:
+
+  - # the main application's chart
+    name: {{ .Values.preview.releaseName }}
+    namespace: {{ .Values.preview.namespace }}
+    chart: ../{{ requiredEnv "APP_NAME" }}
+    values:
+      - values.yaml.gotmpl
+
+  - # we can include other releases as well
+    name: postgresql
+    namespace: 
+    chart: bitnami/postgresql
+    version: 8.9.2
+    values:
+      - postgresql.yaml
+``` 
+Custom values can either be written directly in this file, or in other files - such as values.yaml.gotmpl - which are defined in the main `helmfile.yaml`.
+```go-text-template
+# This file contains the custom values for our application's chart
+# and support Go templates, parsed by https://github.com/roboll/helmfile
+
+image:
+  repository: {{ .Values.preview.image.repository }}
+  tag: {{ .Values.preview.image.tag }}
+
+ingress:
+  enabled: true
+  class: nginx
+  hosts:
+    - '{{ .values.preview.name }}.{{ .Values.expose.config.domain }}'
+  tls:
+    enabled: true
+    secrets:
+      wildcard:
+        replicateFrom: {{ requiredEnv "WILDCARD_TLS_SECRET_LOCATION" }}
+
+labels:
+  git-commit: {{ requiredEnv "PULL_PULL_SHA" }}
+
+```
 
 The `jx preview` command will have to be modified to execute the `helmfile apply` command on this directory. This command will take care of:
 - adding required Helm repositories
@@ -64,7 +133,8 @@ We will also need to pass some values calculated by Jenkins X - such as the `ext
 
 #### 2.3.1 Quick and dirty implementation
 
-I already have a working implementation which we are already using at Dailymotion. It's just a quick and dirty implementation that works for our use-case, so it will need more work to handle more use-cases.
+I already have a working implementation which we are already using at Dailymotion.
+It's just a quick and dirty implementation that works for our use-case, so it will need more work to handle more use-cases.
 
 It is in the [preview-helmfile branch](https://github.com/vbehar/jx/tree/preview-helmfile), and you can see the [diff with jx master](https://github.com/jenkins-x/jx/compare/master...vbehar:preview-helmfile).
 
@@ -77,7 +147,31 @@ A few notes:
 - the `jx preview` command has a new `--helmfile` flag to give it the name of a helmfile.yaml
 - the `helmfile` command being used is `helmfile --file=helmfile.yaml --state-values-file=extraValues.yaml --state-values-set=tags.jx-ns-NAMESPACE=true,global.jxNsNAMESPACE=true,...,global.jxNs=NAMESPACE,... --namespace=NAMESPACE apply`
 
-We call it with the following flags: `jx preview --app "${APP_NAME}" --namespace "preview-${APP_NAME}-pr-${PULL_NUMBER}" --name "preview-${APP_NAME}-pr-${PULL_NUMBER}" --release "preview-${APP_NAME}-pr-${PULL_NUMBER}" --helmfile "helmfile.yaml" --verbose` - see [jenkins-x.yml](jenkins-x.yml) for the jx pipeline.
+We call it with the following flags: `jx preview --app "${APP_NAME}" --namespace "preview-${APP_NAME}-pr-${PULL_NUMBER}" --name "preview-${APP_NAME}-pr-${PULL_NUMBER}" --release "preview-${APP_NAME}-pr-${PULL_NUMBER}" --helmfile "helmfile.yaml" --verbose` - see  the jenkins-x.yml below for the jx pipeline.
+```yaml
+buildPack: none
+pipelineConfig:
+  pipelines:
+    pullRequest:
+      pipeline:
+        stages:
+          - name: preview-env
+            steps:
+              - name: deploy-preview-env
+                command: jx preview
+                args:
+                  - --app "${APP_NAME}"
+                  - --namespace "preview-${APP_NAME}-pr-${PULL_NUMBER}"
+                  - --name "preview-${APP_NAME}-pr-${PULL_NUMBER}"
+                  - --release "preview-${APP_NAME}-pr-${PULL_NUMBER}"
+                  - --helmfile "helmfile.yaml"
+                  - --verbose
+                dir: charts/preview
+                image: our-custom-jx-image-with-helmfile
+                env:
+                  - name: WILDCARD_TLS_SECRET_LOCATION
+                    value: jx/tls-jx-example-com-p
+```
 
 The `--app` flag is "mandatory" when using helmfile, to avoid trying to find a default value from the preview chart, which doesn't exist anymore.
 
@@ -86,11 +180,314 @@ The `jx preview` command is now run in a specific container image, which contain
 - `helmfile` version 0.111.0 - it needs a recent version to support the `helmBinary` config flag
 - `helm3` binary, we used version 3.2.0
 - a few Helm plugins
-see the [Dockerfile](Dockerfile) for more details. This image has both `helm` and `helm3` binaries. We might have plugins compatibility issues. For now in this quick-and-dirty implementation we ignored this issue, because this image is only used to run `jx preview` with helmfile and helm 3, so it never uses Helm 2.
+see the Dockerfile below for more details. This image has both `helm` and `helm3` binaries. We might have plugins compatibility issues. 
+For now in this quick-and-dirty implementation we ignored this issue, because this image is only used to run `jx preview` with helmfile and helm 3, so it never uses Helm 2.
+
+```docker
+# part of the Dockerfile used to build the container image used to run "jx preview" with helmfile
+
+# install helm
+ENV HELM_VERSION 2.14.2
+ENV HELM_HOME "/helm"
+RUN echo "Installing Helm ${HELM_VERSION}" \
+ && curl -f https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz | tar xzv \
+ && mv linux-amd64/helm /usr/bin/ \
+ && mv linux-amd64/tiller /usr/bin/ \
+ && rm -rf linux-amd64 \
+ && helm init --client-only
+
+ENV HELM3_VERSION="3.2.0"
+RUN echo "Installing Helm3 ${HELM3_VERSION}" \
+ && curl -f https://get.helm.sh/helm-v${HELM3_VERSION}-linux-amd64.tar.gz | tar xzv \
+ && mv linux-amd64/helm /usr/bin/helm3 \
+ && rm -rf linux-amd64
+
+ENV HELM_PLUGINS="/helm/plugins"
+RUN echo "Installing Helm3 plugins in ${HELM_PLUGINS}" \
+ && export XDG_DATA_HOME="/" \
+ && helm3 plugin install https://github.com/futuresimple/helm-secrets --version v2.0.2 \
+ && helm3 plugin install https://github.com/databus23/helm-diff --version v3.1.1 \
+ && helm3 plugin install https://github.com/hayorov/helm-gcs --version 0.3.1 \
+ && unset XDG_DATA_HOME
+
+ENV HELMFILE_VERSION 0.111.0
+RUN echo "Installing helmfile ${HELMFILE_VERSION}" \
+ && curl -LO https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 \
+ && chmod +x helmfile_linux_amd64 \
+ && mv helmfile_linux_amd64 /usr/bin/helmfile
+
+# install kubectl
+ENV KUBECTL_VERSION="1.15"
+RUN echo "Installing kubectl ${KUBECTL_VERSION}" \
+ && curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable-${KUBECTL_VERSION}.txt)/bin/linux/amd64/kubectl \
+ && chmod +x kubectl \
+ && mv kubectl /usr/bin/
+```
 
 You can see the output:
-- [for the first run](output-1.txt)
-- [for the second run](output-2.txt)
+- for the first run
+```plaintext
+Creating a preview
+expose:
+  Annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+  config:
+    domain: jx.example.com
+    exposer: Ingress
+    http: "true"
+preview:
+  image:
+    repository: gcr.io/owner/myapp
+    tag: 0.0.0-SNAPSHOT-PR-129-16
+  name: preview-myapp-pr-129
+  namespace: preview-myapp-pr-129
+  releaseName: preview-myapp-pr-129
+Installing Preview Environment with Helmfile...
+Running: helmfile --file=helmfile.yaml --state-values-file=/workspace/source/charts/preview/extraValues.yaml --state-values-set=tags.jx-ns-preview-myapp-pr-129=true,global.jxNsPreviewMyappPr129=true,tags.jx-preview=true,tags.jx-env-preview-myapp-pr-129=true,global.jxPreview=true,global.jxEnvPreviewMyappPr129=true,global.jxNs=preview-myapp-pr-129,global.jxTypeEnv=preview,global.jxEnv=preview-myapp-pr-129,global.jxPreviewApp=myapp,global.jxPreviewPr=129 --namespace=preview-myapp-pr-129 apply
+Building dependency release=preview-myapp-pr-129, chart=../myapp
+Comparing release=preview-myapp-pr-129, chart=../myapp
+********************
+
+	Release was not present in Helm.  Diff will show entire contents as new.
+
+********************
+preview-myapp-pr-129, preview-myapp-pr-129-tls-wildcard, Secret (v1) has been added:
++ # Source: myapp/templates/ingress.yaml
++ apiVersion: v1
++ kind: Secret
++ metadata:
++   annotations:
++     replicator.v1.mittwald.de/replicate-from: jx/tls-jx-example-com-p
++   labels:
++     app.kubernetes.io/instance: preview-myapp-pr-129
++     app.kubernetes.io/managed-by: Helm
++     app.kubernetes.io/name: myapp
++     app.kubernetes.io/version: latest
++     git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
++     helm.sh/chart: myapp-4.3.0
++   name: preview-myapp-pr-129-tls-wildcard
++ data:
++   tls.crt: '++++++++ # (0 bytes)'
++   tls.key: '++++++++ # (0 bytes)'
++ type: kubernetes.io/tls
+
+preview-myapp-pr-129, preview-myapp-pr-129, Service (v1) has been added:
+-
++ # Source: myapp/templates/service.yaml
++ apiVersion: v1
++ kind: Service
++ metadata:
++   name: preview-myapp-pr-129
++   labels:
++     helm.sh/chart: myapp-4.3.0
++     app.kubernetes.io/name: myapp
++     app.kubernetes.io/instance: preview-myapp-pr-129
++     app.kubernetes.io/version: "latest"
++     app.kubernetes.io/managed-by: Helm
++     git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
++ spec:
++   type: ClusterIP
++   ports:
++     - name: http
++       port: 8080
++       targetPort: http
++   selector:
++     app.kubernetes.io/name: myapp
++     app.kubernetes.io/instance: preview-myapp-pr-129
+preview-myapp-pr-129, preview-myapp-pr-129, Deployment (apps) has been added:
+-
++ # Source: myapp/templates/deployment.yaml
++ apiVersion: apps/v1
++ kind: Deployment
++ metadata:
++   name: preview-myapp-pr-129
++   labels:
++     helm.sh/chart: myapp-4.3.0
++     app.kubernetes.io/name: myapp
++     app.kubernetes.io/instance: preview-myapp-pr-129
++     app.kubernetes.io/version: "latest"
++     app.kubernetes.io/managed-by: Helm
++     git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
++ spec:
++   replicas: 1
++   revisionHistoryLimit: 2
++   selector:
++     matchLabels:
++       app.kubernetes.io/name: myapp
++       app.kubernetes.io/instance: preview-myapp-pr-129
++   template:
++     metadata:
++       labels:
++         helm.sh/chart: myapp-4.3.0
++         app.kubernetes.io/name: myapp
++         app.kubernetes.io/instance: preview-myapp-pr-129
++         app.kubernetes.io/version: "latest"
++         app.kubernetes.io/managed-by: Helm
++         git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
++     spec:
++       containers:
++         - name: myapp
++           image: "gcr.io/owner/myapp:0.0.0-SNAPSHOT-PR-129-16"
++           ports:
++             - name: http
++               containerPort: 8080
++           livenessProbe:
++             tcpSocket:
++               port: http
++           readinessProbe:
++             httpGet:
++               path: /
++               port: http
++           resources:
++             limits:
++               cpu: "0.1"
++               memory: 32M
++             requests:
++               cpu: "0.1"
++               memory: 32M
++       enableServiceLinks: false
++       terminationGracePeriodSeconds: 30
+preview-myapp-pr-129, preview-myapp-pr-129, Ingress (networking.k8s.io) has been added:
+-
++ # Source: myapp/templates/ingress.yaml
++ apiVersion: networking.k8s.io/v1beta1
++ kind: Ingress
++ metadata:
++   name: preview-myapp-pr-129
++   labels:
++     helm.sh/chart: myapp-4.3.0
++     app.kubernetes.io/name: myapp
++     app.kubernetes.io/instance: preview-myapp-pr-129
++     app.kubernetes.io/version: "latest"
++     app.kubernetes.io/managed-by: Helm
++     git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
++   annotations:
++     kubernetes.io/ingress.class: nginx
++     kubernetes.io/ingress.allow-http: "false"
++ spec:
++   rules:
++     - host: preview-myapp-pr-129.jx.example.com
++       http:
++         paths:
++           - backend:
++               serviceName: preview-myapp-pr-129
++               servicePort: 8080
++   tls:
++     - secretName: preview-myapp-pr-129-tls-wildcard
+
+Upgrading release=preview-myapp-pr-129, chart=../myapp
+Release "preview-myapp-pr-129" does not exist. Installing it now.
+NAME: preview-myapp-pr-129
+LAST DEPLOYED: Fri Apr 24 05:11:49 2020
+NAMESPACE: preview-myapp-pr-129
+STATUS: deployed
+REVISION: 1
+
+Listing releases matching ^preview-myapp-pr-129$
+preview-myapp-pr-129	preview-myapp-pr-129	1       	2020-04-24 05:11:49.634624822 +0000 UTC	deployed	myapp-4.3.0	latest
+
+
+UPDATED RELEASES:
+NAME                          CHART             VERSION
+preview-myapp-pr-129   ../myapp     4.3.0
+
+Preview Environment successfully installed with Helmfile!
+```
+- for the second run
+```plaintext
+Creating a preview
+expose:
+  Annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+  config:
+    domain: jx.example.com
+    exposer: Ingress
+    http: "true"
+preview:
+  image:
+    repository: gcr.io/owner/myapp
+    tag: 0.0.0-SNAPSHOT-PR-129-18
+  name: preview-myapp-pr-129
+  namespace: preview-myapp-pr-129
+  releaseName: preview-myapp-pr-129
+Installing Preview Environment with Helmfile...
+Running: helmfile --file=helmfile.yaml --state-values-file=/workspace/source/charts/preview/extraValues.yaml --state-values-set=tags.jx-ns-preview-myapp-pr-129=true,global.jxNsPreviewMyappPr129=true,tags.jx-preview=true,tags.jx-env-preview-myapp-pr-129=true,global.jxPreview=true,global.jxEnvPreviewMyappPr129=true,global.jxNs=preview-myapp-pr-129,global.jxTypeEnv=preview,global.jxEnv=preview-myapp-pr-129,global.jxPreviewApp=myapp,global.jxPreviewPr=129 --namespace=preview-myapp-pr-129 apply
+Building dependency release=preview-myapp-pr-129, chart=../myapp
+Comparing release=preview-myapp-pr-129, chart=../myapp
+preview-myapp-pr-129, preview-myapp-pr-129, Deployment (apps) has changed:
+  # Source: myapp/templates/deployment.yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: preview-myapp-pr-129
+    labels:
+      helm.sh/chart: myapp-4.3.0
+      app.kubernetes.io/name: myapp
+      app.kubernetes.io/instance: preview-myapp-pr-129
+      app.kubernetes.io/version: "latest"
+      app.kubernetes.io/managed-by: Helm
+      git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 2
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: myapp
+        app.kubernetes.io/instance: preview-myapp-pr-129
+    template:
+      metadata:
+        labels:
+          helm.sh/chart: myapp-4.3.0
+          app.kubernetes.io/name: myapp
+          app.kubernetes.io/instance: preview-myapp-pr-129
+          app.kubernetes.io/version: "latest"
+          app.kubernetes.io/managed-by: Helm
+          git-commit: 94f909b03f2f4189ac433e1aba8cd1147b3aa467
+      spec:
+        containers:
+          - name: myapp
+-           image: "gcr.io/owner/myapp:0.0.0-SNAPSHOT-PR-129-16"
++           image: "gcr.io/owner/myapp:0.0.0-SNAPSHOT-PR-129-18"
+            ports:
+              - name: http
+                containerPort: 8080
+            livenessProbe:
+              tcpSocket:
+                port: http
+            readinessProbe:
+              httpGet:
+                path: /
+                port: http
+            resources:
+              limits:
+                cpu: "0.1"
+                memory: 32M
+              requests:
+                cpu: "0.1"
+                memory: 32M
+        enableServiceLinks: false
+        terminationGracePeriodSeconds: 30
+
+Upgrading release=preview-myapp-pr-129, chart=../myapp
+Release "preview-myapp-pr-129" has been upgraded. Happy Helming!
+Listing releases matching ^preview-myapp-pr-129$
+NAME: preview-myapp-pr-129
+LAST DEPLOYED: Fri Apr 24 08:36:04 2020
+NAMESPACE: preview-myapp-pr-129
+STATUS: deployed
+REVISION: 2
+
+preview-myapp-pr-129	preview-myapp-pr-129	2       	2020-04-24 08:36:04.231316767 +0000 UTC	deployed	myapp-4.3.0	latest
+
+
+UPDATED RELEASES:
+NAME                          CHART             VERSION
+preview-myapp-pr-129   ../myapp     4.3.0
+
+Preview Environment successfully installed with Helmfile!
+```
 
 #### 2.3.3 Proposed implementation
 
@@ -111,11 +508,15 @@ There are quite a few benefits:
 
 ## 4. Migration
 
-It is a relatively small change but with a big impact, because it will impact the organization of all repositories using Jenkins X. Here is a migration plan proposal:
+It is a relatively small change but with a big impact, because it will impact the organization of all repositories using Jenkins X.
+Here is a migration plan proposal:
 
-1. Use a new "alpha" command to allow a few users to try out this new feature, without impacting other users. This would still require a change in the container image, to bundle Helmfile and Helm 3 along with jx and Helm 2.
-1. Use an auto-detection mechanism to see if the `charts/preview` directory contains a `Chart.yaml` or an `helmfile.yaml` file, and use the right tool - Helm or Helmfile - based on that. This would allow users to migrate their repositories one by one.
-1. Update the buildpacks to generate the `charts/preview` with an `helmfile.yaml` file instead of an "umbrella" chart. At this point new repositories will use Helmfile by default.
+1. Use a new "alpha" command to allow a few users to try out this new feature, without impacting other users.
+This would still require a change in the container image, to bundle Helmfile and Helm 3 along with jx and Helm 2.
+1. Use an auto-detection mechanism to see if the `charts/preview` directory contains a `Chart.yaml` or an `helmfile.yaml` file, and use the right tool - Helm or Helmfile - based on that.
+This would allow users to migrate their repositories one by one.
+1. Update the buildpacks to generate the `charts/preview` with an `helmfile.yaml` file instead of an "umbrella" chart.
+At this point new repositories will use Helmfile by default.
 1. Write a migration tool / command to migrate from an umbrella chart to an Helmfile structure?
 1. Deprecate the support for the umbrella chart: when we detect a `Chart.yaml` print a warning message in the logs.
 1. Remove support for the umbrella chart.
