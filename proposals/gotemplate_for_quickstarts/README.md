@@ -20,11 +20,11 @@ The format of the inserted strings are also fixed to lower case.
 
 # Proposal
 
-Introduce configuration of the templating. The file .jx/gotemplate.yaml is read in a quickstart
-repository would configure the templating. Just the presense of this file (with the correct
+Introduce configuration of the templating. If the file .jx/gotemplate.yaml exists in a quickstart
+repository it is read and used to configure the templating. Just the presense of this file (with the correct
 apiVersion and kind) would enable go template support. To reduce the risk for interference with go
 templating of k8s resources and for other purposes the delimiters would by default be '[[' and ']]'
-instead of the default '{{' and '}}'. But the use of other delimiters should possible to configure.
+instead of the default '{{' and '}}'. But the use of other delimiters should be possible to configure.
 
 I propose that also a pack could have a .jx/gotemplate.yaml, which would control the templating of
 the pack.
