@@ -20,6 +20,8 @@ The format of the inserted strings are also fixed to lower case.
 
 # Proposal
 
+## Improved templating
+
 Introduce configuration of the templating. If the file .jx/gotemplate.yaml exists in a quickstart
 repository it is read and used to configure the templating. Just the presense of this file (with the correct
 apiVersion and kind) would enable go template support. To reduce the risk for interference with go
@@ -41,9 +43,35 @@ There are more information known to jx project that could be in quickstarts. If 
 version where exposed the need for multiple packs for different java version could probably be
 eliminated.
 
-I also propose support for adding custom values. This could be done in a similar way as it was done
-in the apps functionality of Jenkins X 2, where the json schema for a helm chart
-(values.schema.json) where used to prompt the user for missing values.
+## Custom values
+
+I also propose support for adding custom values. Somehow the quickstart / pack should have
+requirements on values for the user to fill in. The types of input items should (at least) be
+boolean, select, multi select and in text format.
+
+Fields could be defined as optional based on values already inputed by user. For example if a user
+opts to enable database support they should be asked for more datails.
+
+This could be done in a similar way as it was done in the apps functionality of Jenkins X 2, where
+the json schema for a helm chart (values.schema.json) where used to prompt the user for missing
+values.
+
+## UI neutral
+
+We currently only have a terminal UI to create an application. It would be preferable to build the new
+functionality so alternative UIs (ie web) are feasable.
+
+## Use ska?
+
+A templating tool/library that support some of these things already is
+https://github.com/gchiesa/ska/. It only seem to support asking for text values. On the other hand
+it also supports updating an application from a quickstart.
+
+It does support multiple templates for one app, which we need (quickstart and pack).
+
+## Build UI with huh?
+
+A library to gather information from the user is https://github.com/charmbracelet/huh.
 
 # Drawbacks
 
