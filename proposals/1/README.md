@@ -39,7 +39,7 @@ Then all of these things would be an `App`:
 * system charts like knative, gloo, nginx-controller, flagger, prometheus, external-dns, cert-manager
 * instantiations of Quickstarts or repositories that folks import
 
-## Status: Proposed
+## Status: Deprecated
 
 ## Implementation
 

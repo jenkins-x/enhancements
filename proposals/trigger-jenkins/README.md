@@ -3,6 +3,7 @@ title: Trigger Jenkins
 linktitle: Trigger Jenkins
 description: Trigger Jenkins Pipelines from Jenkins X and Tekton
 weight: 70
+type: docs
 ---
 
 # Problem: be able to trigger pipelines in remote Jenkins servers

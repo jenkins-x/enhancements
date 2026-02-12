@@ -3,6 +3,7 @@ title: Use Tekton Dashboard
 linktitle: Use Tekton Dashboard
 description: Use Tekton Dashboard with logs persistency through TEP-0117 Tekton Results Logs
 weight: 100
+type: docs
 ---
 
 ## 1. Overview

@@ -3,6 +3,7 @@ title: Proposals
 linktitle: Proposals
 description: Proposed Pull Requests
 weight: 100
+type: docs
 ---
 
 
